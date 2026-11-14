@@ -1,0 +1,756 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Nolost nape</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 30px;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        h1 {
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .description {
+            text-align: center;
+            font-size: 17px;
+            color: #475569;
+            margin-bottom: 35px;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            align-items: end;
+            margin-bottom: 30px;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            background: white;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        h2 {
+            color: #1e3a8a;
+            margin-bottom: 15px;
+        }
+
+        #map {
+            width: 100%;
+            height: 480px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #e2e8f0;
+        }
+
+        #result {
+            margin-top: 25px;
+            padding: 22px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+        }
+
+        #result h3 {
+            color: #1e3a8a;
+            margin-top: 0;
+        }
+
+        #resultContent {
+            white-space: pre-line;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+        }
+
+        #status {
+            color: #64748b;
+            font-size: 14px;
+            margin-top: 12px;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+
+        .legend span {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .line {
+            display: inline-block;
+            width: 25px;
+            height: 4px;
+            background: #94a3b8;
+        }
+
+        .route-line {
+            background: #2563eb;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        @media (max-width: 850px) {
+            .controls {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 550px) {
+            body {
+                padding: 12px;
+            }
+
+            .container {
+                padding: 18px;
+            }
+
+            .controls {
+                grid-template-columns: 1fr;
+            }
+
+            #map {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- APPLICATION TITLE -->
+
+    <h1>Nolost maps </h1>
+
+    <p class="description">
+        Find the best path between two locations using
+        different pathfinding algorithms.
+    </p>
+
+
+    <!-- USER CONTROLS -->
+
+    <div class="controls">
+
+        <div class="field">
+
+            <label for="source">Source Location</label>
+
+            <select id="source">
+                <option value="A">Node A</option>
+                <option value="B">Node B</option>
+                <option value="C">Node C</option>
+                <option value="D">Node D</option>
+                <option value="E">Node E</option>
+                <option value="F">Node F</option>
+                <option value="G">Node G</option>
+                <option value="H">Node H</option>
+                <option value="I">Node I</option>
+                <option value="J">Node J</option>
+            </select>
+
+        </div>
+
+
+        <div class="field">
+
+            <label for="destination">Destination Location</label>
+
+            <select id="destination">
+                <option value="A">Node A</option>
+                <option value="B">Node B</option>
+                <option value="C">Node C</option>
+                <option value="D">Node D</option>
+                <option value="E">Node E</option>
+                <option value="F">Node F</option>
+                <option value="G">Node G</option>
+                <option value="H">Node H</option>
+                <option value="I">Node I</option>
+                <option value="J" selected>Node J</option>
+            </select>
+
+        </div>
+
+
+        <div class="field">
+
+            <label for="algorithm">Select Algorithm</label>
+
+            <select id="algorithm">
+                <option value="bfs">BFS</option>
+                <option value="dfs">DFS</option>
+                <option value="dijkstra" selected>Dijkstra</option>
+                <option value="astar">A*</option>
+            </select>
+
+        </div>
+
+
+        <div class="field">
+
+            <button type="button" id="findPath">
+                Find Path
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- GOOGLE MAP -->
+
+    <h2>Map Visualization</h2>
+
+    <div class="legend">
+        <span>
+            <i class="line"></i>
+            Graph Connections
+        </span>
+
+        <span>
+            <i class="line route-line"></i>
+            Calculated Route
+        </span>
+    </div>
+
+    <div id="map"></div>
+
+
+    <!-- RESULT SECTION -->
+
+    <div id="result">
+
+        <h3>Pathfinding Results</h3>
+
+        <div id="resultContent">
+            Select your source, destination and algorithm,
+            then click Find Path.
+        </div>
+
+        <div id="status">
+            Waiting for path calculation...
+        </div>
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <div class="footer">
+
+        <p>
+            Pathfinding Assignment | Django & Python
+        </p>
+
+        <p>
+            Algorithms: BFS | DFS | Dijkstra | A*
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- JAVASCRIPT -->
+
+<script>
+
+    // =====================================
+    // 1. GRAPH NODE COORDINATES
+    // =====================================
+
+    const NODES = {
+
+        A: { lat: 23.7380, lng: 90.3940 },
+        B: { lat: 23.7460, lng: 90.3970 },
+        C: { lat: 23.7330, lng: 90.4050 },
+        D: { lat: 23.7500, lng: 90.4100 },
+        E: { lat: 23.7560, lng: 90.4000 },
+        F: { lat: 23.7280, lng: 90.4150 },
+        G: { lat: 23.7440, lng: 90.4200 },
+        H: { lat: 23.7600, lng: 90.4180 },
+        I: { lat: 23.7350, lng: 90.4300 },
+        J: { lat: 23.7540, lng: 90.4320 }
+
+    };
+
+
+    // =====================================
+    // 2. GRAPH CONNECTIONS
+    // =====================================
+
+    const EDGES = [
+
+        ["A", "B"],
+        ["A", "C"],
+        ["B", "D"],
+        ["B", "E"],
+        ["C", "D"],
+        ["C", "F"],
+        ["D", "E"],
+        ["D", "G"],
+        ["E", "H"],
+        ["F", "G"],
+        ["F", "I"],
+        ["G", "H"],
+        ["G", "J"],
+        ["H", "J"],
+        ["I", "J"]
+
+    ];
+
+
+    // =====================================
+    // 3. MAP VARIABLES
+    // =====================================
+
+    let map;
+
+    let routeLine = null;
+
+    let graphLines = [];
+
+    let markers = [];
+
+
+    // =====================================
+    // 4. INITIALIZE GOOGLE MAP
+    // =====================================
+
+    window.initMap = function () {
+
+        map = new google.maps.Map(
+
+            document.getElementById("map"),
+
+            {
+
+                center: {
+                    lat: 23.7440,
+                    lng: 90.4140
+                },
+
+                zoom: 14,
+
+                mapTypeControl: true,
+
+                streetViewControl: false,
+
+                fullscreenControl: true
+
+            }
+
+        );
+
+
+        // Draw all graph connections
+
+        EDGES.forEach(function (edge) {
+
+            const start = edge[0];
+
+            const end = edge[1];
+
+            const line = new google.maps.Polyline({
+
+                path: [
+                    NODES[start],
+                    NODES[end]
+                ],
+
+                geodesic: true,
+
+                strokeColor: "#94a3b8",
+
+                strokeOpacity: 0.8,
+
+                strokeWeight: 3,
+
+                map: map
+
+            });
+
+            graphLines.push(line);
+
+        });
+
+
+        // Add markers for all nodes
+
+        Object.entries(NODES).forEach(function ([name, position]) {
+
+            const marker = new google.maps.Marker({
+
+                position: position,
+
+                map: map,
+
+                label: name,
+
+                title: "Node " + name
+
+            });
+
+            markers.push(marker);
+
+        });
+
+
+        document.getElementById("status").textContent =
+            "Google Maps loaded successfully. 10 nodes displayed.";
+
+    };
+
+
+    // =====================================
+    // 5. DRAW CALCULATED ROUTE
+    // =====================================
+
+    function drawRoute(path) {
+
+        if (!map || !path.length) {
+            return;
+        }
+
+
+        // Remove previous route
+
+        if (routeLine) {
+
+            routeLine.setMap(null);
+
+        }
+
+
+        // Convert node names into coordinates
+
+        const routeCoordinates = path.map(function (node) {
+
+            return NODES[node];
+
+        });
+
+
+        // Draw the highlighted route
+
+        routeLine = new google.maps.Polyline({
+
+            path: routeCoordinates,
+
+            geodesic: true,
+
+            strokeColor: "#2563eb",
+
+            strokeOpacity: 1,
+
+            strokeWeight: 6,
+
+            map: map
+
+        });
+
+
+        // Automatically fit the map
+
+        const bounds = new google.maps.LatLngBounds();
+
+        routeCoordinates.forEach(function (position) {
+
+            bounds.extend(position);
+
+        });
+
+        map.fitBounds(bounds);
+
+    }
+
+
+    // =====================================
+    // 6. GET HTML ELEMENTS
+    // =====================================
+
+    const findButton =
+        document.getElementById("findPath");
+
+    const sourceSelect =
+        document.getElementById("source");
+
+    const destinationSelect =
+        document.getElementById("destination");
+
+    const algorithmSelect =
+        document.getElementById("algorithm");
+
+    const resultContent =
+        document.getElementById("resultContent");
+
+    const statusBox =
+        document.getElementById("status");
+
+
+    // =====================================
+    // 7. FIND PATH BUTTON
+    // =====================================
+
+    findButton.addEventListener("click", async function () {
+
+        const source = sourceSelect.value;
+
+        const destination = destinationSelect.value;
+
+        const algorithm = algorithmSelect.value;
+
+
+        // Validate source and destination
+
+        if (source === destination) {
+
+            resultContent.textContent =
+                "Source and destination cannot be the same.";
+
+            statusBox.textContent =
+                "Please select different nodes.";
+
+            return;
+
+        }
+
+
+        // Check whether map is loaded
+
+        if (!map) {
+
+            resultContent.textContent =
+                "Google Maps is still loading. Please wait.";
+
+            statusBox.textContent =
+                "Map is not ready.";
+
+            return;
+
+        }
+
+
+        // Show loading message
+
+        findButton.disabled = true;
+
+        findButton.textContent = "Calculating...";
+
+        resultContent.textContent =
+            "Calculating the shortest path...";
+
+        statusBox.textContent =
+            "Processing request...";
+
+
+        // Prepare API request
+
+        const params = new URLSearchParams({
+
+            source: source,
+
+            destination: destination,
+
+            algorithm: algorithm
+
+        });
+
+
+        try {
+
+            // Send request to Django
+
+            const response = await fetch(
+
+                `/api/find-path/?${params.toString()}`
+
+            );
+
+
+            const data = await response.json();
+
+
+            // Check response
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error || "Path calculation failed."
+                );
+
+            }
+
+
+            // Check route
+
+            if (!data.path || data.path.length === 0) {
+
+                resultContent.textContent =
+                    "No path found between the selected nodes.";
+
+                statusBox.textContent =
+                    "No route available.";
+
+                return;
+
+            }
+
+
+            // Display calculated results
+
+            resultContent.textContent =
+
+                "Algorithm: " +
+                algorithm.toUpperCase() + "\n\n" +
+
+                "Source: " +
+                source + "\n" +
+
+                "Destination: " +
+                destination + "\n\n" +
+
+                "Calculated Path: " +
+                data.path.join(" → ") + "\n\n" +
+
+                "Total Distance: " +
+                data.distance_km + " km\n\n" +
+
+                "Visited Nodes: " +
+                data.visited.join(", ") + "\n\n" +
+
+                "Total Visited Nodes: " +
+                data.visited.length;
+
+
+            // Draw route on Google Maps
+
+            drawRoute(data.path);
+
+
+            statusBox.textContent =
+                "Path calculated and displayed successfully.";
+
+
+        }
+
+        catch (error) {
+
+            resultContent.textContent =
+                "Error: " + error.message;
+
+            statusBox.textContent =
+                "Path calculation failed.";
+
+            console.error(error);
+
+        }
+
+        finally {
+
+            findButton.disabled = false;
+
+            findButton.textContent = "Find Path";
+
+        }
+
+    });
+
+
+    // =====================================
+    // 8. GOOGLE MAP AUTHENTICATION FAILURE
+    // =====================================
+
+    window.gm_authFailure = function () {
+
+        document.getElementById("status").textContent =
+            "Google Maps authentication failed. Check your API key.";
+
+    };
+
+
+</script>
+
+
+<!-- =====================================
+     9. GOOGLE MAPS JAVASCRIPT API
+===================================== -->
+
+<script
+    async
+    defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBmpknwM6UjzlxRttTAj0wbf6NoelcGI6Y&callback=initMap&libraries=maps">
+</script>
+
+
+</body>
+</html>
